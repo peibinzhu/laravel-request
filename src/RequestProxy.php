@@ -1225,7 +1225,7 @@ class RequestProxy extends Request
     {
         // Calling parent class methods in a non-coroutine environment or
         // when an instance cannot be obtained in a coroutine context
-        if (Coroutine::getCid() == -1 || $request = $this->getRequest()) {
+        if (Coroutine::getCid() == -1 || !($request = $this->getRequest())) {
             return parent::$name(...$arguments);
         }
 
