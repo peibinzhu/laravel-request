@@ -75,7 +75,7 @@ class RequestProxy extends Request
     /**
      * {@inheritdoc}
      */
-    public function getPort(): int | string | null
+    public function getPort(): int|string|null
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -1223,12 +1223,12 @@ class RequestProxy extends Request
      */
     protected function call($name, $arguments)
     {
-        // Calling parent class methods in a non-coroutine environment.
-        if (Coroutine::getCid() == -1) {
+        // Calling parent class methods in a non-coroutine environment or
+        // when an instance cannot be obtained in a coroutine context
+        if (Coroutine::getCid() == -1 || $request = $this->getRequest()) {
             return parent::$name(...$arguments);
         }
 
-        $request = $this->getRequest();
         if (!method_exists($request, $name)) {
             throw new RuntimeException('Method not exist.');
         }
@@ -1238,9 +1238,9 @@ class RequestProxy extends Request
     /**
      * Get the Request instance from the coroutine context.
      *
-     * @return Request
+     * @return Request|null
      */
-    protected function getRequest(): Request
+    protected function getRequest(): ?Request
     {
         return Context::get(Request::class);
     }
